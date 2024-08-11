@@ -1,22 +1,29 @@
 <template>
-    <div style="height: 100vh;width: 100vw;overflow: hidden;">
-        <VueFlow v-model:nodes="nodes" v-model:edges="edges" :nodes-draggable="false" @node-click="onNodeClick">
+    <div style="height: 100vh;width: 100vw;overflow: hidden;" id="problem">
+        <VueFlow v-model:nodes="nodes" v-model:edges="edges" :nodes-draggable="false" @node-click="onNodeClick"
+            style="cursor: none!important;">
             <template #node-level="levelNodeProps">
                 <level-node v-bind="levelNodeProps"></level-node>
             </template>
         </VueFlow>
+        <div class="big-circle">
+            <div ref="circle" class="circle"></div>
+            <div ref="dot" class="dot"></div>
+        </div>
     </div>
 </template>
 
 <script setup>
 import { VueFlow, useVueFlow } from '@vue-flow/core';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import levelNode from '../components/problem/level-node.vue';
 
 const router = useRouter();
 const left = window.innerWidth / 2;
 const top = window.innerHeight / 2;
+const circle = ref(void 0);
+const dot = ref(void 0);
 
 const nodes = ref([
     { id: '1', position: { x: (left - 75), y: (top - 35) }, type: 'level', label: '输入与输出', data: { to: 'level/1' } },
@@ -113,6 +120,87 @@ const edges = ref([
 function onNodeClick({ event, node }) {
     router.push(node.data.to);
 }
+
+let pointerX = 0
+let pointerY = 0
+let cursorSize = 50
+
+function move(event) {
+    pointerX = event.pageX
+    pointerY = event.pageY;
+    dot.value.style.transform = `translate3d(calc(-50% + ${pointerX}px), calc(-50% + ${pointerY}px), 0)`
+
+    if (event.target.classList[0] === 'level-node') {
+        circle.value.style.transform = `translate3d(${event.target.getBoundingClientRect().left}px, ${event.target.getBoundingClientRect().top}px, 0)`;
+        circle.value.style.width = `${event.target.getBoundingClientRect().width}px`;
+        circle.value.style.height = `${event.target.getBoundingClientRect().height}px`;
+        circle.value.style.borderRadius = `5px`;
+        circle.value.style.top = '0';
+        circle.value.style.left = '0';
+    } else {
+        circle.value.style.transform = `translate3d(${pointerX}px, ${pointerY}px, 0)`;
+        circle.value.style.width = `${cursorSize}px`;
+        circle.value.style.height = `${cursorSize}px`;
+        circle.value.style.borderRadius = `50%`;
+        circle.value.style.top = `-25px`;
+        circle.value.style.left = `-25px`;
+    }
+}
+
+function click() {
+    circle.value.style.transform += ` scale(0.75)`;
+    setTimeout(() => {
+        circle.value.style.transform = circle.value.style.transform.replace(` scale(0.75)`, '')
+    }, 35);
+}
+
+onMounted(() => {
+    document.addEventListener("mousemove", move);
+    document.addEventListener("click", click);
+})
+onBeforeUnmount(() => {
+    document.removeEventListener("mousemove", move);
+    document.removeEventListener("click", click);
+})
 </script>
 
-<style scoped></style>
+<style scoped>
+.big-circle .circle {
+    position: fixed;
+    top: -25px;
+    left: -25px;
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0);
+    z-index: 9999;
+    border-radius: 50%;
+    transition: 500ms, transform 100ms;
+    user-select: none;
+    pointer-events: none;
+    -webkit-backdrop-filter: invert(0.85) grayscale(1);
+    backdrop-filter: invert(0.85) grayscale(1);
+}
+
+.big-circle .dot {
+    position: fixed;
+    box-sizing: border-box;
+    width: 6px;
+    height: 6px;
+    top: 0px;
+    left: 0px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0);
+    user-select: none;
+    pointer-events: none;
+    transition: 250ms, transform 75ms;
+    -webkit-backdrop-filter: invert(0.85) grayscale(1);
+    backdrop-filter: invert(0.85) grayscale(1);
+}
+
+#problem :deep(.vue-flow__pane.draggable),
+#problem :deep(.vue-flow__node),
+#problem :deep(.vue-flow__edge) {
+    cursor: none !important;
+}
+</style>

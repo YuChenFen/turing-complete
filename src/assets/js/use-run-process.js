@@ -30,10 +30,10 @@ export function useRunProcess({ inputIdList = [], inputValueList = [], outputIdL
 
 
         for (let i = 0, lenIV = inputValueList.length; i < lenIV; i++) {
-            outputStore.ticks += 1;
             for (let j = 0, lenII = inputIdList.length; j < lenII; j++) {
                 updateNodeData(inputIdList[j], { value: inputValueList[i][j] });
             }
+            outputStore.ticks += 1;
             await new Promise(resolve => setTimeout(resolve, 200));
             let output = [], flag = false;
             for (let j = 0, lenOI = outputIdList.length; j < lenOI; j++) {

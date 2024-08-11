@@ -56,6 +56,7 @@ for (let i = 0; i < 200; i++) {
         step = value;
     } else {
         outputValueList.push([step++])
+        step &= 255;
     }
 }
 
@@ -86,7 +87,7 @@ const nodeLabel = {
     '-3': '输出'
 }
 
-const bitList = ['bit-not', 'bit-and', 'bit-nand', 'bit-or', 'bit-nor', 'bit-xor', 'bit-xnor', 'bit-switch', 'bit-low', 'bit-high','delay', 'bit-storage'];
+const bitList = ['bit-not', 'bit-and', 'bit-nand', 'bit-or', 'bit-nor', 'bit-xor', 'bit-xnor', 'bit-switch', 'bit-low', 'bit-high', 'delay', 'bit-storage'];
 const byteList = ['bit-to-byte', 'byte-to-bit', 'byte-switch', 'byte-add', 'byte-storage'];
 const toolsList = ['if-equal']
 </script>

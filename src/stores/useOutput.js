@@ -6,7 +6,7 @@ const useOutputStore = defineStore('outputStore', {
     state: () => {
         return {
             output: ref([]),
-            ticks: ref(0)
+            ticks: ref(0),
         }
     }
 })

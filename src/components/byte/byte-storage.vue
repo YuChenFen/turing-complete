@@ -35,25 +35,15 @@ const input_read = toRef(() => props.data.input_read)
 const input_a = toRef(() => props.data.input_a)
 const output_a = ref(0);
 
-function update() {
+watch(ticks, () => {
+    if (ticks.value == 1) {
+        updateNodeData(props.id, { output_a: 0 });
+        return;
+    }
     if (input_read.value & 1) {
         updateNodeData(props.id, { output_a: output_a.value });
     } else {
         updateNodeData(props.id, { output_a: void 0 });
-    }
-    if (input_write.value & 1) {
-        output_a.value = input_a.value & 255;
-    }
-}
-
-watch(ticks, () => {
-    console.log('ticks', ticks.value);
-    if (ticks.value == 1) {
-        updateNodeData(props.id, { output_a: 0 });
-        return
-    }
-    if (ticks.value) {
-        update();
     }
 })
 watch(input_write, () => {
@@ -61,7 +51,6 @@ watch(input_write, () => {
         output_a.value = input_a.value & 255;
     }
 })
-
 watch(input_a, () => {
     if (input_write.value & 1) {
         output_a.value = input_a.value & 255;
